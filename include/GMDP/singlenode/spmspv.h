@@ -34,6 +34,7 @@
 #define SRC_SINGLENODE_SPMSPV_H_
 #include <xmmintrin.h>
 #include "GMDP/utils/bitvector.h"
+#include "trace.h"
 
 
 template <typename Ta, typename Tx, typename Ty>
@@ -54,25 +55,34 @@ void my_spmspv(int* row_inds, int* col_ptrs, int* col_indices, Ta* vals,
     const int* col_ptrs_cur = col_ptrs + col_starts[p];
     for (int j = 0; j < (col_starts[p + 1] - col_starts[p]) - 1 ; j++) {
       int col_index = col_indices[col_starts[p] + j];
+	  TRACE_VERTEX_READ(col_index, &(col_indices[col_starts[p] + j]), sizeof(trace_vertex_t));
       if(get_bitvector(col_index, xbit_vector)) {
         Tx Xval = xvalue[col_index];
+		TRACE_PROP_READ(col_index, &(xvalue[col_index]), sizeof(trace_vertex_t));
         _mm_prefetch((char*)(xvalue + column_offset[j + 4]), _MM_HINT_T0);
 
         int nz_idx = col_ptrs_cur[j];
         for (; nz_idx < col_ptrs_cur[j + 1]; nz_idx++) {
           int row_ind = partitioned_row_offset[nz_idx];
+		  TRACE_EDGE_READ(row_ind, col_index, &(partitioned_row_offset[nz_idx]), sizeof(trace_edge_t));
           Ta Aval = partitioned_val_offset[nz_idx];
+		  TRACE_WEIGHT_READ(row_ind, col_index, &(partitioned_val_offset[nz_idx]), sizeof(trace_edge_t));
 	  Ty temp_mul_result;
           op_mul(Aval, Xval, &temp_mul_result, vsp);
+		  TRACE_PROP_WRITE(col_index, &temp_mul_result, sizeof(trace_prop_t));
           if(get_bitvector(row_ind, ybit_vector))
 	  {
 	    //Ty temp_y_copy = yvalue[row_ind];
             //op_add(temp_y_copy, temp_mul_result, &(yvalue[row_ind]), vsp);
             op_add(yvalue[row_ind], temp_mul_result, &(yvalue[row_ind]), vsp);
+			TRACE_PROP_READ(row_ind, &(yvalue[row_ind]), sizeof(trace_prop_t));
+			TRACE_PROP_READ(col_index, &(temp_mul_result), sizeof(trace_prop_t));
+			TRACE_PROP_WRITE(row_ind, &(yvalue[row_ind]), sizeof(trace_prop_t));
 	  }
 	  else
 	  {
             yvalue[row_ind] = temp_mul_result;
+			TRACE_PROP_WRITE(row_ind, &(yvalue[row_ind]), sizeof(trace_prop_t));
             set_bitvector(row_ind, ybit_vector);
 	  }
         }
@@ -107,21 +117,29 @@ void my_csrspmspv(Ta* a, int* ia, int* ja, Tx* xvalue, int * xbit_vector,
       if(row_exists)
       {
         yval = yvalue[row];
+		TRACE_PROP_READ(row, &(yvalue[row]), sizeof(trace_prop_t));
       }
+	  TRACE_VERTEX_READ(row, &(ia[row]), sizeof(trace_vertex_t));
       for (int nz = ia[row]; nz < ia[row + 1]; nz++) {
         Ty tmp_mul;
         int col_id = ja[nz-1]-1;
+		TRACE_EDGE_READ(row, col_id, &(ja[nz - 1]), sizeof(trace_edge_t));
         if(get_bitvector(col_id, xbit_vector))
         {
           op_mul(a[nz - 1], xvalue[col_id], &tmp_mul, vsp);
+		  TRACE_WEIGHT_READ(row, col_id, &(a[nz - 1]), sizeof(trace_weight_t));
+		  TRACE_PROP_READ(col_id, &(xvalue[col_id]), sizeof(trace_prop_t));
+		  TRACE_PROP_WRITE(col_id, &(tmp_mul), sizeof(trace_prop_t));
           if(row_exists)
           {
             Ty tmp_add = yval;
             op_add(tmp_add, tmp_mul, &yval, vsp);
+			TRACE_PROP_READ(row, &(tmp_mul), sizeof(trace_prop_t));
           } 
           else
           {
             yval = tmp_mul;
+			TRACE_PROP_READ(row, &(tmp_mul), sizeof(trace_prop_t));
             set_bitvector(row, ybit_vector);
   	    row_exists=true;
           }
@@ -130,6 +148,7 @@ void my_csrspmspv(Ta* a, int* ia, int* ja, Tx* xvalue, int * xbit_vector,
       if(row_exists)
       {
         yvalue[row] = yval;
+		TRACE_PROP_WRITE(row, &(yvalue[row]), sizeof(trace_prop_t));
       }
     }
   }
@@ -154,22 +173,30 @@ void my_dcsrspmspv(Ta* a, int* ia, int* ja, int * row_ids, int num_rows, int * p
       if(row_exists)
       {
         yval = yvalue[row];
+		TRACE_PROP_READ(row, &(yvalue[row]), sizeof(trace_prop_t));
       }
+	  TRACE_VERTEX_READ(_row, &(ia[_row]), sizeof(trace_vertex_t));
       for (int nz = ia[_row]; nz < ia[_row + 1]; nz++) {
         Ty tmp_mul;
         int col_id = ja[nz];
+		TRACE_EDGE_READ(_row, col_id, &(ja[nz]), sizeof(trace_edge_t));
         if(get_bitvector(col_id, xbit_vector))
         {
           op_mul(a[nz], xvalue[col_id], &tmp_mul, vsp);
+		  TRACE_WEIGHT_READ(_row, col_id, &(a[nz]), sizeof(trace_weight_t));
+		  TRACE_PROP_READ(col_id, &(xvalue[col_id]), sizeof(trace_prop_t));
+		  TRACE_PROP_WRITE(col_id, &(tmp_mul), sizeof(trace_prop_t));
           if(row_exists)
           {
             Ty tmp_add = yval;
             op_add(tmp_add, tmp_mul, &yval, vsp);
+			TRACE_PROP_READ(_row, &(tmp_mul), sizeof(trace_prop_t));
           } 
           else
           {
             yval = tmp_mul;
-            row_exists=true;
+			TRACE_PROP_READ(row, &(tmp_mul), sizeof(trace_prop_t));
+			row_exists=true;
           }
         }
       }
@@ -177,7 +204,8 @@ void my_dcsrspmspv(Ta* a, int* ia, int* ja, int * row_ids, int num_rows, int * p
       {
         set_bitvector(row, ybit_vector);
         yvalue[row] = yval;
-      }
+		TRACE_PROP_WRITE(row, &(yvalue[row]), sizeof(trace_prop_t));
+	  }
     }
   }
 }
@@ -194,7 +222,9 @@ void my_coospmspv(Ta* a, int* ia, int* ja, int num_partitions, int * partition_s
     for(int nz = partition_starts[partition] ; nz < partition_starts[partition+1] ; nz++)
     {
       int row = ia[nz]-1;
+	  TRACE_VERTEX_READ(row, &(ia[nz]), sizeof(trace_vertex_t));
       int col = ja[nz]-1;
+	  TRACE_EDGE_READ(row, col, &(ja[nz]), sizeof(trace_edge_t));
 #ifdef __DEBUG
       assert(row < m);
       assert(row >= 0);
@@ -205,17 +235,24 @@ void my_coospmspv(Ta* a, int* ia, int* ja, int num_partitions, int * partition_s
       {
         Ty tmp_mul;
         op_mul(a[nz], xvalue[col], &tmp_mul, vsp);
+		TRACE_WEIGHT_READ(row, col, &(a[nz]), sizeof(trace_edge_t));
+		TRACE_PROP_READ(col, &(xvalue[col]), sizeof(trace_vertex_t));
+		TRACE_PROP_WRITE(col, &(tmp_mul), sizeof(trace_prop_t));
         bool row_exists = get_bitvector(row, ybit_vector);
         if(!row_exists)
         {
           yvalue[row] = tmp_mul;
+		  TRACE_VERTEX_WRITE(row, &(yvalue[row]), sizeof(trace_prop_t));
         }
         else
         {
           Ty tmp_add = yvalue[row];
+		  TRACE_PROP_READ(row, &(yvalue[row]), sizeof(trace_prop_t));
           Ty yval;
           op_add(tmp_add, tmp_mul, &yval, vsp);
+		  TRACE_PROP_READ(row, &(tmp_mul), sizeof(trace_prop_t));
           yvalue[row] = yval;
+		  TRACE_PROP_WRITE(row, &(yvalue[row]), sizeof(trace_prop_t));
         }
         set_bitvector(row, ybit_vector);
       }
