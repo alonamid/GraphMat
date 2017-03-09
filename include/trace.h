@@ -77,12 +77,12 @@ static inline const char* to_string(AccessType tt) {
 typedef uint64_t IdType;
 // TODO: trace address range
 template<typename T>
-static inline void trace_access(DataType data, AccessType access, IdType& id, T* start_addr, long unsigned int size) {
+static inline void trace_access(DataType data, AccessType access, IdType id, T* start_addr, long unsigned int size) {
 	trace_out << to_string(data) << "," << to_string(access) << "," << id << "," << start_addr << "," << size << std::endl;
 }
 
 template<typename T>
-static inline void trace_access(DataType data, AccessType access, IdType& id1, IdType& id2, T* start_addr, long unsigned int size) {
+static inline void trace_access(DataType data, AccessType access, IdType id1, IdType id2, T* start_addr, long unsigned int size) {
 	trace_out << to_string(data) << "," << to_string(access) << ",<" << id1 << " " << id2 << ">," << start_addr << "," << size << std::endl;
 }
 

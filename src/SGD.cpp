@@ -28,8 +28,10 @@
 * ******************************************************************************/
 /* Narayanan Sundaram (Intel Corp.)
  * ******************************************************************************/
+#include "trace.h"
 #include <omp.h>
 #include "GraphMatRuntime.h"
+
 
 const int MAX_THREADS = 120;
 

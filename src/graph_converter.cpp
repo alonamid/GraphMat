@@ -11,10 +11,12 @@
 #include "assert.h"
 #include <getopt.h>
 
+#include "trace.h"
 #include "boost/archive/binary_iarchive.hpp"
 #include "boost/archive/binary_oarchive.hpp"
 #include "GMDP/gmdp.h"
 #include "Graph.h"
+
 
 struct myoptions {
 	int selfloops;

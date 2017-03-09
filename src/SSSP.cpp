@@ -29,8 +29,10 @@
 /* Narayanan Sundaram (Intel Corp.)
  * ******************************************************************************/
 
+#include "trace.h"
 #include <climits>
 #include <cfloat>
+
 
 #include "GraphMatRuntime.h"
 

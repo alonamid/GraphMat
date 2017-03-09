@@ -28,11 +28,13 @@
 * ******************************************************************************/
 /* Narayanan Sundaram (Intel Corp.)
  * ******************************************************************************/
+#include "trace.h"
 #include <omp.h>
 #include <mpi.h>
 #include "GraphMatRuntime.h"
 #include <algorithm>
 #include <iomanip>
+
 
 template <unsigned int K>
 class LatentVector {

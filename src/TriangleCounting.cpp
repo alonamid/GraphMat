@@ -29,11 +29,13 @@
 /* Narayanan Sundaram (Intel Corp.)
  * ******************************************************************************/
 
+#include "trace.h"
 #include "GraphMatRuntime.h"
 #include <vector>
 #include <algorithm>
 #include <assert.h>
 #include <boost/serialization/vector.hpp>
+
 
 
 class TC : public GraphMat::Serializable {

@@ -29,9 +29,11 @@
 /* Narayanan Sundaram (Intel Corp.)
  * ******************************************************************************/
 
+#include "trace.h"
 #include <climits>
 #include <cfloat>
 #include "GraphMatRuntime.cpp"
+
 
 //typedef unsigned char distance_type;
 //typedef unsigned int distance_type;

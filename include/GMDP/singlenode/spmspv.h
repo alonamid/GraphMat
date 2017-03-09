@@ -34,8 +34,6 @@
 #define SRC_SINGLENODE_SPMSPV_H_
 #include <xmmintrin.h>
 #include "GMDP/utils/bitvector.h"
-#include "trace.h"
-
 
 template <typename Ta, typename Tx, typename Ty>
 void my_spmspv(int* row_inds, int* col_ptrs, int* col_indices, Ta* vals,
