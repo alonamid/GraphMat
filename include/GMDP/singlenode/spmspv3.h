@@ -53,29 +53,38 @@ void my_spmspv3(int* row_inds, int* col_ptrs, int* col_indices, Ta* vals,
     const int* col_ptrs_cur = col_ptrs + col_starts[p];
     for (int j = 0; j < (col_starts[p + 1] - col_starts[p]) - 1; j++) {
       int col_index = col_indices[col_starts[p] + j];
+	  TRACE_VERTEX_READ(col_index, &(col_indices[col_starts[p] + j]), sizeof(trace_vertex_t));
       if(get_bitvector(col_index, xbit_vector)) {
         Tx Xval = xvalue[col_index];
+		TRACE_PROP_READ(col_index, &(xvalue[col_index]), sizeof(trace_prop_t));
         _mm_prefetch((char*)(xvalue + column_offset[j + 4]), _MM_HINT_T0);
 
         int nz_idx = col_ptrs_cur[j];
         for (; nz_idx < col_ptrs_cur[j + 1]; nz_idx++) {
           int row_ind = partitioned_row_offset[nz_idx];
+		  TRACE_EDGE_READ(row_ind, col_index, &(partitioned_row_offset[nz_idx]), sizeof(trace_edge_t));
 	  //Tvp VPVal = vpvalue[row_ind];
 	  assert(get_bitvector(row_ind, vpbit_vector));
           Ta Aval = partitioned_val_offset[nz_idx];
+		  TRACE_WEIGHT_READ(row_ind, col_index, &(partitioned_val_offset[nz_idx]), sizeof(trace_edge_t));
           if(get_bitvector(row_ind, ybit_vector))
 	  {
             Ty tmp_mul;
             //Ty tmp_add;
             op_mul(Aval, Xval, vpvalue[row_ind], &tmp_mul, vsp);
+			TRACE_PROP_WRITE(col_index, &tmp_mul_result, sizeof(trace_prop_t));
             op_add(yvalue[row_ind], tmp_mul, &yvalue[row_ind], vsp);
             //yvalue[row_ind] = tmp_add;
+			TRACE_PROP_READ(row_ind, &(yvalue[row_ind]), sizeof(trace_prop_t));
+			TRACE_PROP_READ(col_index, &(tmp_mul), sizeof(trace_prop_t));
+			TRACE_PROP_WRITE(row_ind, &(yvalue[row_ind]), sizeof(trace_prop_t));
 	  }
 	  else
 	  {
             //Ty tmp_mul;
             //op_mul(Aval, Xval, VPVal, &tmp_mul, vsp);
             op_mul(Aval, Xval, vpvalue[row_ind], &yvalue[row_ind], vsp);
+			TRACE_PROP_WRITE(col_index, &yvalue[row_ind], sizeof(trace_prop_t));
             //yvalue[row_ind] = tmp_mul;
             set_bitvector(row_ind, ybit_vector);
 	  }

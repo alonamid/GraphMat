@@ -45,10 +45,10 @@ static inline void trace_prop(const char* name, const T& value) {
 }
 
 
-typedef uint64_t trace_edge_t;
-typedef uint64_t trace_vertex_t;
-typedef uint64_t trace_prop_t;
-typedef uint64_t trace_weight_t;
+typedef uint32_t trace_edge_t;
+typedef uint32_t trace_vertex_t;
+typedef uint32_t trace_prop_t;
+typedef uint32_t trace_weight_t;
 typedef uint64_t addr_t;
 
 
@@ -78,12 +78,13 @@ typedef uint64_t IdType;
 // TODO: trace address range
 template<typename T>
 static inline void trace_access(DataType data, AccessType access, IdType id, T* start_addr, long unsigned int size) {
-	trace_out << to_string(data) << "," << to_string(access) << "," << id << "," << start_addr << "," << size << std::endl;
+	//trace_out << to_string(data) << "," << to_string(access) << "," << id << "," << start_addr << "," << size << std::endl;
+	trace_out << to_string(data) << "," << id << "," << start_addr << "," << size << std::endl;
 }
 
 template<typename T>
 static inline void trace_access(DataType data, AccessType access, IdType id1, IdType id2, T* start_addr, long unsigned int size) {
-	trace_out << to_string(data) << "," << to_string(access) << ",<" << id1 << " " << id2 << ">," << start_addr << "," << size << std::endl;
+	trace_out << to_string(data) << ",<" << id1 << " " << id2 << ">," << start_addr << "," << size << std::endl;
 }
 
 

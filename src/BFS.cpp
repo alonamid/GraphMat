@@ -165,7 +165,7 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
-  TRACE_OPEN("bfs_trace.txt");
+  TRACE_OPEN("/scratch/alonamid/bfs_trace.txt");
   int source_vertex = atoi(argv[2]);
   run_bfs(argv[1], source_vertex);
   TRACE_FINISH();

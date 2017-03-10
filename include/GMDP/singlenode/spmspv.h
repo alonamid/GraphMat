@@ -56,7 +56,7 @@ void my_spmspv(int* row_inds, int* col_ptrs, int* col_indices, Ta* vals,
 	  TRACE_VERTEX_READ(col_index, &(col_indices[col_starts[p] + j]), sizeof(trace_vertex_t));
       if(get_bitvector(col_index, xbit_vector)) {
         Tx Xval = xvalue[col_index];
-		TRACE_PROP_READ(col_index, &(xvalue[col_index]), sizeof(trace_vertex_t));
+		TRACE_PROP_READ(col_index, &(xvalue[col_index]), sizeof(trace_prop_t));
         _mm_prefetch((char*)(xvalue + column_offset[j + 4]), _MM_HINT_T0);
 
         int nz_idx = col_ptrs_cur[j];
@@ -234,13 +234,13 @@ void my_coospmspv(Ta* a, int* ia, int* ja, int num_partitions, int * partition_s
         Ty tmp_mul;
         op_mul(a[nz], xvalue[col], &tmp_mul, vsp);
 		TRACE_WEIGHT_READ(row, col, &(a[nz]), sizeof(trace_edge_t));
-		TRACE_PROP_READ(col, &(xvalue[col]), sizeof(trace_vertex_t));
+		TRACE_PROP_READ(col, &(xvalue[col]), sizeof(trace_prop_t));
 		TRACE_PROP_WRITE(col, &(tmp_mul), sizeof(trace_prop_t));
         bool row_exists = get_bitvector(row, ybit_vector);
         if(!row_exists)
         {
           yvalue[row] = tmp_mul;
-		  TRACE_VERTEX_WRITE(row, &(yvalue[row]), sizeof(trace_prop_t));
+		  TRACE_PROP_WRITE(row, &(yvalue[row]), sizeof(trace_prop_t));
         }
         else
         {

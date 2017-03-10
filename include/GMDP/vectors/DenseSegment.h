@@ -488,10 +488,10 @@ class DenseSegment {
 
     for (uint64_t i = 0; i < (uint64_t)_nnz; i++) {
       int src = edges[i].src - row_start - 1;
-	  //TRACE_EDGE_READ(src, i, &(edges[i].src), sizeof(trace_edge_t));
+	  TRACE_EDGE_READ(src, i, &(edges[i].src), sizeof(trace_edge_t));
       set_bitvector(src, properties->bit_vector);
       properties->value[src] = edges[i].val;
-	  //TRACE_WEIGHT_READ(src, i, &(edges[i].val), sizeof(trace_weight_t));
+	  TRACE_WEIGHT_READ(src, i, &(edges[i].val), sizeof(trace_weight_t));
     }
     properties->nnz = _nnz;
     properties->uninitialized = false;
@@ -793,10 +793,10 @@ class DenseSegment {
       {
         edges[mycnt].src = start_nz + i + 1;
         edges[mycnt].dst = 1;
-		//TRACE_EDGE_WRITE(edges[mycnt].src, edges[mycnt].dst, &(edges[mycnt].dst), sizeof(trace_edge_t));
+		TRACE_EDGE_WRITE(edges[mycnt].src, edges[mycnt].dst, &(edges[mycnt].dst), sizeof(trace_edge_t));
         edges[mycnt].val = properties->value[i];
-		//TRACE_WEIGHT_READ(edges[mycnt].src, edges[mycnt].dst, &(properties->value[i]), sizeof(trace_weight_t));
-		//TRACE_WEIGHT_WRITE(edges[mycnt].src, edges[mycnt].dst, &(edges[mycnt].val), sizeof(trace_weight_t));
+		TRACE_WEIGHT_READ(edges[mycnt].src, edges[mycnt].dst, &(properties->value[i]), sizeof(trace_weight_t));
+		TRACE_WEIGHT_WRITE(edges[mycnt].src, edges[mycnt].dst, &(edges[mycnt].val), sizeof(trace_weight_t));
         mycnt++;
       }
     }
