@@ -39,10 +39,10 @@ void remove_selfedges(edgelist_t<T>* edgelist) {
   int new_nnz = 0;
   edgelist_t<T> new_edgelist(edgelist->m, edgelist->n, edgelist->nnz);
   for(int i = 0; i < edgelist->nnz; i++) {
-    TRACE_EDGE_READ(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]), sizeof(edge_t));
+    TRACE_EDGE_READ(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]));
     if (edgelist->edges[i].src != edgelist->edges[i].dst) {
       new_edgelist.edges[new_nnz] = edgelist->edges[i];
-	  TRACE_EDGE_WRITE(edgelist->edges[i].src, edgelist->edges[i].src, &(edgelist->edges[new_nnz]), sizeof(edge_t));
+	  TRACE_EDGE_WRITE(edgelist->edges[i].src, edgelist->edges[i].src, &(edgelist->edges[new_nnz]));
       new_nnz++;
     }
   }
@@ -56,8 +56,8 @@ void remove_selfedges(edgelist_t<T>* edgelist) {
 
 template<typename T>
 bool compare_for_duplicates(const edge_t<T>& e1, const edge_t<T>& e2) {
-  TRACE_EDGE_READ(e1.src, e1.dst, &(e1), sizeof(edge_t));
-  TRACE_EDGE_READ(e2.src, e2.dst, &(e2), sizeof(edge_t));
+  TRACE_EDGE_READ(e1.src, e1.dst, &(e1));
+  TRACE_EDGE_READ(e2.src, e2.dst, &(e2));
   if (e1.src < e2.src) return true;
   else if (e1.src > e2.src) return false;
   if (e1.dst < e2.dst) return true;
@@ -80,14 +80,14 @@ void remove_duplicate_edges_local(edgelist_t<T>* edgelist) {
     nnz2=1;
 
     for(unsigned long int i = 1; i < edgelist->nnz; i++) {
-	  TRACE_EDGE_READ(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]), sizeof(edge_t));
-	  TRACE_EDGE_READ(edgelist->edges[i-1].src, edgelist->edges[i-1].dst, &(edgelist->edges[i-1]), sizeof(edge_t));
+	  TRACE_EDGE_READ(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]));
+	  TRACE_EDGE_READ(edgelist->edges[i-1].src, edgelist->edges[i-1].dst, &(edgelist->edges[i-1]));
       if ((edgelist->edges[i].src == edgelist->edges[i-1].src) && 
           (edgelist->edges[i].dst == edgelist->edges[i-1].dst)) {
         continue;
       } else {
         new_edgelist.edges[nnz2] = edgelist->edges[i];
-		TRACE_EDGE_WRITE(new_edgelist.edges[nnz2].src, new_edgelist.edges[nnz2].src, &(new_edgelist.edges[nnz2]), sizeof(edge_t));
+		TRACE_EDGE_WRITE(new_edgelist.edges[nnz2].src, new_edgelist.edges[nnz2].src, &(new_edgelist.edges[nnz2]));
         nnz2++;
       }
     }
@@ -160,7 +160,7 @@ void shuffle_edges(edgelist_t<T>* edgelist) {
       int bin = (edgelist->edges[i].src-1)%global_nrank;
       assert(bin >= 0 && bin <= global_nrank-1);
       tedges[offset[omp_get_thread_num()*global_nrank + bin] + woffset[omp_get_thread_num()*global_nrank + bin]] = edgelist->edges[i];
-	  TRACE_EDGE_READ(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]), sizeof(edge_t));
+	  TRACE_EDGE_READ(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]));
       woffset[omp_get_thread_num()*global_nrank + bin]++;
     }
   }
@@ -397,7 +397,7 @@ void randomize_edge_direction(edgelist_t<T>* edgelist) {
   for(int i = 0; i < edgelist->nnz; i++) {
     if ((double)rand()/(double)RAND_MAX < 0.5) {
       std::swap(edgelist->edges[i].src, edgelist->edges[i].dst);
-	  TRACE_EDGE_RW(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]), sizeof(edge_t));
+	  TRACE_EDGE_RW(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]));
     }
   }
 }
@@ -408,11 +408,11 @@ void create_bidirectional_edges(edgelist_t<T>* edgelist) {
   for(int i = 0; i < edgelist->nnz; i++) {
     new_edgelist.edges[2*i] = edgelist->edges[i];
     new_edgelist.edges[2*i+1] = edgelist->edges[i];
-	TRACE_EDGE_READ(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]), sizeof(edge_t));
-	TRACE_EDGE_WRITE(new_edgelist.edges[2*i].src, new_edgelist.edges[2*i].dst, &(new_edgelist.edges[2*i]), sizeof(edge_t));
-	TRACE_EDGE_WRITE(new_edgelist.edges[2*i + 1].src, new_edgelist.edges[2*i + 1].dst, &(new_edgelist.edges[2*i + 1]), sizeof(edge_t));
+	TRACE_EDGE_READ(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]));
+	TRACE_EDGE_WRITE(new_edgelist.edges[2*i].src, new_edgelist.edges[2*i].dst, &(new_edgelist.edges[2*i]));
+	TRACE_EDGE_WRITE(new_edgelist.edges[2*i + 1].src, new_edgelist.edges[2*i + 1].dst, &(new_edgelist.edges[2*i + 1]));
     std::swap(new_edgelist.edges[2*i+1].src, new_edgelist.edges[2*i+1].dst);
-	TRACE_EDGE_RW(new_edgelist.edges[2 * i + 1].src, new_edgelist.edges[2 * i + 1].dst, &(new_edgelist.edges[2 * i + 1]), sizeof(edge_t));
+	TRACE_EDGE_RW(new_edgelist.edges[2 * i + 1].src, new_edgelist.edges[2 * i + 1].dst, &(new_edgelist.edges[2 * i + 1]));
   }
   edgelist->clear();
   edgelist->edges = new_edgelist.edges;
@@ -425,10 +425,10 @@ void create_bidirectional_edges(edgelist_t<T>* edgelist) {
 template <typename T>
 void convert_to_dag(edgelist_t<T>* edgelist) {
   for(int i = 0; i < edgelist->nnz; i++) {
-	TRACE_EDGE_READ(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]), sizeof(edge_t));
+	TRACE_EDGE_READ(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]));
     if (edgelist->edges[i].src > edgelist->edges[i].dst) {
       std::swap(edgelist->edges[i].src, edgelist->edges[i].dst);
-	  TRACE_EDGE_RW(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]), sizeof(edge_t));
+	  TRACE_EDGE_RW(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]));
     }
   }
 }
@@ -440,7 +440,7 @@ void random_edge_weights(edgelist_t<T>* edgelist, int random_range) {
     if (t > random_range) t = random_range;
     if (t < 1) t = 1;
     edgelist->edges[i].val = (T)t;
-	TRACE_WEIGHT_WRITE(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]), sizeof(edge_t));
+	TRACE_WEIGHT_WRITE(edgelist->edges[i].src, edgelist->edges[i].dst, &(edgelist->edges[i]));
   }
 }
 

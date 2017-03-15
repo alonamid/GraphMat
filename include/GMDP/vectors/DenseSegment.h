@@ -794,7 +794,7 @@ class DenseSegment {
       {
         edges[mycnt].src = start_nz + i + 1;
         edges[mycnt].dst = 1;
-		TRACE_EDGE_WRITE(edges[mycnt].src, edges[mycnt].dst, &(edges[mycnt].dst), sizeof(edge_t));
+		TRACE_EDGE_WRITE(edges[mycnt].src, edges[mycnt].dst, &(edges[mycnt].dst));
         edges[mycnt].val = properties->value[i];
 		TRACE_WEIGHT_READ(edges[mycnt].src, edges[mycnt].dst, &(properties->value[i]), sizeof(trace_weight_t));
 		TRACE_WEIGHT_WRITE(edges[mycnt].src, edges[mycnt].dst, &(edges[mycnt].val), sizeof(trace_weight_t));
