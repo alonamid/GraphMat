@@ -72,7 +72,7 @@ void my_spmspv3(int* row_inds, int* col_ptrs, int* col_indices, Ta* vals,
             Ty tmp_mul;
             //Ty tmp_add;
             op_mul(Aval, Xval, vpvalue[row_ind], &tmp_mul, vsp);
-			TRACE_PROP_WRITE(col_index, &tmp_mul_result, sizeof(trace_prop_t));
+			TRACE_PROP_WRITE(col_index, &tmp_mul, sizeof(trace_prop_t));
             op_add(yvalue[row_ind], tmp_mul, &yvalue[row_ind], vsp);
             //yvalue[row_ind] = tmp_add;
 			TRACE_PROP_READ(row_ind, &(yvalue[row_ind]), sizeof(trace_prop_t));

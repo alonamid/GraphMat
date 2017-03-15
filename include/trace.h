@@ -88,6 +88,21 @@ static inline void trace_access(DataType data, AccessType access, IdType id1, Id
 }
 
 
+
+/*
+template<typename T>
+static inline void trace_access(DataType data, AccessType access, IdType id, T* start_addr, T2 size) {
+	//trace_out << to_string(data) << "," << to_string(access) << "," << id << "," << start_addr << "," << size << std::endl;
+	trace_out << to_string(data) << "," << id << "," << start_addr << "," << size << std::endl;
+}
+
+template<typename T, typename T2>
+static inline void trace_access(DataType data, AccessType access, IdType id1, IdType id2, T* start_addr, T2 size) {
+	trace_out << to_string(data) << ",<" << id1 << " " << id2 << ">," << start_addr << "," << size << std::endl;
+}
+*/
+
+
 #else
 
 #define TRACE_OPEN(filename)
