@@ -172,7 +172,9 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
+  TRACE_OPEN("/scratch/alonamid/pagerank_trace.txt");
   run_pagerank<int>(input_filename);
+  TRACE_FINISH();
 
   MPI_Finalize();
 }
