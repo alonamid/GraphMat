@@ -184,7 +184,7 @@ class buffer
       num_ints = _num_ints;
       value = new T[capacity]; 
       bit_vector = new int[num_ints];
-      //compressed_data = reinterpret_cast<T*>(_mm_malloc(capacity * sizeof(T) + capacity*sizeof(int), 64));
+      //compressed_data = reinterpret_cast<T*>(aligned_alloc(capacity * sizeof(T) + capacity*sizeof(int), 64));
       compressed_data = new T[capacity];
       compressed_indices = new int[capacity];
       uninitialized = true;
@@ -210,7 +210,7 @@ class buffer
       int len = 0;
       #pragma omp parallel for reduction(+:len)
       for (int ii = 0 ; ii < num_ints ; ii++) {
-        int p = _popcnt32(bit_vector[ii]);
+        int p = __builtin_popcount(bit_vector[ii]);
         len += p;
       }
       return len;
@@ -221,7 +221,7 @@ class buffer
       int len = 0;
       #pragma omp parallel for reduction(+:len)
       for (int ii = start  ; ii < finish ; ii++) {
-        int p = _popcnt32(bit_vector[ii]);
+        int p = __builtin_popcount(bit_vector[ii]);
         len += p;
       }
       return len;
@@ -316,7 +316,7 @@ class buffer
         
         for(int ii = start_i ; ii < end_i ; ii++)
         {
-          if(_popcnt32(bit_vector[ii]) == 0) continue;
+          if(__builtin_popcount(bit_vector[ii]) == 0) continue;
           for(int i = ii*32 ; i < (ii+1)*32 ; i++)
           {
             if(get_bitvector(i, bit_vector))
@@ -392,7 +392,7 @@ class buffer
         
         for(int ii = start_i ; ii < end_i ; ii++)
         {
-          if(_popcnt32(bit_vector[ii]) == 0) continue;
+          if(__builtin_popcount(bit_vector[ii]) == 0) continue;
           for(int i = ii*32 ; i < (ii+1)*32 ; i++)
           {
             if(get_bitvector(i, bit_vector))

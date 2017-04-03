@@ -32,7 +32,7 @@
 
 #ifndef SRC_SINGLENODE_SPMSPV3_H_
 #define SRC_SINGLENODE_SPMSPV3_H_
-#include <xmmintrin.h>
+//#include <xmmintrin.h>
 #include "GMDP/utils/bitvector.h"
 
 template <typename Ta, typename Tx, typename Tvp, typename Ty>
@@ -55,7 +55,7 @@ void my_spmspv3(int* row_inds, int* col_ptrs, int* col_indices, Ta* vals,
       int col_index = col_indices[col_starts[p] + j];
       if(get_bitvector(col_index, xbit_vector)) {
         Tx Xval = xvalue[col_index];
-        _mm_prefetch((char*)(xvalue + column_offset[j + 4]), _MM_HINT_T0);
+        //_mm_prefetch((char*)(xvalue + column_offset[j + 4]), _MM_HINT_T0);
 
         int nz_idx = col_ptrs_cur[j];
         for (; nz_idx < col_ptrs_cur[j + 1]; nz_idx++) {

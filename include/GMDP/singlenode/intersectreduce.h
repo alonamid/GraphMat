@@ -50,7 +50,7 @@ void intersect_dense_segment(Ta* v1, int * bv1, int * nnz, int num_ints, Tb * v2
   #pragma omp parallel for reduction(+:tmp_nnz)
   for(int ii = 0 ; ii < num_ints ; ii++)
   {
-    int cnt = _popcnt32(bv3[ii]);
+    int cnt = __builtin_popcount(bv3[ii]);
     if(cnt == 0) continue;
     tmp_nnz += cnt;
     for(int i = ii*32 ; i < (ii+1)*32 ; i++)

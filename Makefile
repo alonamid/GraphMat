@@ -1,5 +1,7 @@
-MPICXX=mpiicpc
-CXX=icpc
+#MPICXX=mpiicpc
+#CXX=icpc
+MPICXX=mpic++
+CXX=aarch64-linux-gnu-gcc
 
 SRCDIR=./src
 INCLUDEDIR=./include
@@ -30,8 +32,6 @@ endif
 
 ifeq (${CXX}, icpc)
   CXX_OPTIONS += -xHost
-else
-  CXX_OPTIONS += -march=native
 endif
 
 ifeq (${timing}, 1)

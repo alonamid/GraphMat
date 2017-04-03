@@ -360,7 +360,7 @@ class SpMat {
     if(nnzs > 0)
     {
       edgelist->edges = reinterpret_cast<edge_t<T>*>(
-          _mm_malloc((uint64_t)nnzs * (uint64_t)sizeof(edge_t<T>), 64));
+          aligned_alloc((uint64_t)nnzs * (uint64_t)sizeof(edge_t<T>), 64));
 
       nnzs = 0;
       for (int i = 0; i < ntiles_y; i++) {
@@ -438,7 +438,7 @@ void Transpose(const SpMat<SpTile<T> >* mat, SpMat<SpTile<T> >** matc, int ntx,
 
   if(edgelist.nnz > 0)
   {
-    _mm_free(edgelist.edges);
+    free(edgelist.edges);
   }
 }
 

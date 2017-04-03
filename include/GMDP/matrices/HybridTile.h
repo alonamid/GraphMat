@@ -110,8 +110,8 @@ class HybridTile {
     nnz1 = ia_gte16[m];
     nnz2 = ia_lt16[m];
 
-    edge_t<T> * edges_gte16 = (edge_t<T>*)_mm_malloc(nnz1 * sizeof(edge_t<T>), 64);
-    edge_t<T> * edges_lt16 = (edge_t<T>*)_mm_malloc(nnz2 * sizeof(edge_t<T>), 64);
+    edge_t<T> * edges_gte16 = (edge_t<T>*)aligned_alloc(nnz1 * sizeof(edge_t<T>), 64);
+    edge_t<T> * edges_lt16 = (edge_t<T>*)aligned_alloc(nnz2 * sizeof(edge_t<T>), 64);
 
     for(unsigned int i = 0 ; i < m ; i++)
     {
@@ -132,8 +132,8 @@ class HybridTile {
     t1 = new DCSRTile<T>(edges_gte16, _m, _n, nnz1, row_start, col_start);
     t2 = new COOSIMD32Tile<T>(edges_lt16, _m, _n, nnz2, row_start, col_start);
 
-    _mm_free(edges_gte16);
-    _mm_free(edges_lt16);
+    free(edges_gte16);
+    free(edges_lt16);
     delete [] ia_gte16;
     delete [] ia_lt16;
   }

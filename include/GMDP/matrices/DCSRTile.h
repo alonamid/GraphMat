@@ -96,11 +96,11 @@ class DCSRTile {
     if(!isEmpty())
     {
       a = reinterpret_cast<T*>(
-          _mm_malloc((uint64_t)nnz * (uint64_t)sizeof(T), 64));
+          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(T), 64));
       ja = reinterpret_cast<int*>(
-          _mm_malloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
-      ia = reinterpret_cast<int*>(_mm_malloc((m + 1) * sizeof(int), 64));
-      row_ids  = reinterpret_cast<int*>(_mm_malloc(num_rows * sizeof(int), 64));
+          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
+      ia = reinterpret_cast<int*>(aligned_alloc((m + 1) * sizeof(int), 64));
+      row_ids  = reinterpret_cast<int*>(aligned_alloc(num_rows * sizeof(int), 64));
       for(int i = 0 ; i < nnz ; i++)
       {
         ar & a[i];
@@ -152,8 +152,8 @@ class DCSRTile {
       }
       num_rows = tmp_buf[nnz-1]+1;
 
-      row_ids = reinterpret_cast<int*>(_mm_malloc(((num_rows)) * sizeof(int), 64));
-      ia = reinterpret_cast<int*>(_mm_malloc(((num_rows) + 1) * sizeof(int), 64));
+      row_ids = reinterpret_cast<int*>(aligned_alloc(((num_rows)) * sizeof(int), 64));
+      ia = reinterpret_cast<int*>(aligned_alloc(((num_rows) + 1) * sizeof(int), 64));
       
       row_ids[0] = (edges[0].src - row_start) - 1;
       ia[0] = 0;
@@ -190,8 +190,8 @@ class DCSRTile {
       }
       partition_ptrs[num_partitions] = num_rows;
 
-      ja = reinterpret_cast<int*>(_mm_malloc((nnz ) * sizeof(int), 64));
-      a = reinterpret_cast<T*>(_mm_malloc((nnz) * sizeof(T), 64));
+      ja = reinterpret_cast<int*>(aligned_alloc((nnz ) * sizeof(int), 64));
+      a = reinterpret_cast<T*>(aligned_alloc((nnz) * sizeof(T), 64));
 
       for(int i = 0 ; i < num_rows ; i++)
       {
@@ -262,10 +262,10 @@ class DCSRTile {
 
   ~DCSRTile(void) {
     if (!isEmpty()) {
-      _mm_free(a);
-      _mm_free(ja);
-      _mm_free(ia);
-      _mm_free(row_ids);
+      free(a);
+      free(ja);
+      free(ia);
+      free(row_ids);
       delete [] partition_ptrs;
     }
   }

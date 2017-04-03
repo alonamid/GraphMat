@@ -47,9 +47,9 @@ void apply_dense_segment(Ta* v1, int * bitvector, int * nnz, int num_ints,
   #pragma omp parallel for reduction(+:tmp_nnz)
   for(int ii = 0 ; ii < num_ints ; ii++)
   {
-    int cnt = _popcnt32(bitvector[ii]);
+    int cnt = __builtin_popcount(bitvector[ii]);
     if(cnt == 0) continue;
-    //if(_popcnt32(bitvector[ii]) == 0) continue;
+    //if(__builtin_popcount(bitvector[ii]) == 0) continue;
     tmp_nnz += cnt;
     for(int i = ii*32 ; i < (ii+1)*32 ; i++)
     {

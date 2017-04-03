@@ -121,12 +121,12 @@ class COOSIMD32Tile {
     if(!isEmpty())
     {
       a = reinterpret_cast<T*>(
-          _mm_malloc((uint64_t)nnz * (uint64_t)sizeof(T), 64));
+          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(T), 64));
       ja = reinterpret_cast<int*>(
-          _mm_malloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
-      ia = reinterpret_cast<int*>(_mm_malloc(nnz * sizeof(int), 64));
-      partition_start  = reinterpret_cast<int*>(_mm_malloc((num_partitions+1) * sizeof(int), 64));
-      simd_nnz = reinterpret_cast<int*>(_mm_malloc((num_partitions+1) * sizeof(int), 64));
+          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
+      ia = reinterpret_cast<int*>(aligned_alloc(nnz * sizeof(int), 64));
+      partition_start  = reinterpret_cast<int*>(aligned_alloc((num_partitions+1) * sizeof(int), 64));
+      simd_nnz = reinterpret_cast<int*>(aligned_alloc((num_partitions+1) * sizeof(int), 64));
       for(int i = 0 ; i < nnz ; i++)
       {
         ar & a[i];
@@ -162,12 +162,12 @@ class COOSIMD32Tile {
       double stt = MPI_Wtime();
     if (nnz > 0) {
       a = reinterpret_cast<T*>(
-          _mm_malloc((uint64_t)nnz * (uint64_t)sizeof(T), 64));
+          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(T), 64));
       ja = reinterpret_cast<int*>(
-          _mm_malloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
+          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
       ia = reinterpret_cast<int*>(
-          _mm_malloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
-      tedge_t<T> * tmpedges = reinterpret_cast<tedge_t<T> *>( _mm_malloc(((uint64_t)nnz) * (uint64_t)sizeof(tedge_t<T>), 64));
+          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
+      tedge_t<T> * tmpedges = reinterpret_cast<tedge_t<T> *>( aligned_alloc(((uint64_t)nnz) * (uint64_t)sizeof(tedge_t<T>), 64));
       num_partitions = omp_get_max_threads() * 4;
 
       // Set partition IDs
@@ -362,7 +362,7 @@ class COOSIMD32Tile {
 #endif // __DEBUG
 
       //delete [] tmpedges;
-      _mm_free(tmpedges);
+      free(tmpedges);
     }
   }
 
@@ -393,9 +393,9 @@ class COOSIMD32Tile {
 
   ~COOSIMD32Tile(void) {
     if (!isEmpty()) {
-      _mm_free(a);
-      _mm_free(ja);
-      _mm_free(ia);
+      free(a);
+      free(ja);
+      free(ia);
       delete [] partition_start;
       delete [] simd_nnz;
     }

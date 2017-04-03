@@ -132,19 +132,19 @@ class DCSCTile {
     if(nnz > 0)
     {
       vals = reinterpret_cast<T *>(
-          _mm_malloc(nnz * sizeof(T), 64));
+          aligned_alloc(nnz * sizeof(T), 64));
       row_inds = reinterpret_cast<int *>(
-          _mm_malloc(nnz * sizeof(int), 64));
+          aligned_alloc(nnz * sizeof(int), 64));
       row_pointers = reinterpret_cast<int *>(
-          _mm_malloc((num_partitions+1) * sizeof(int), 64));
+          aligned_alloc((num_partitions+1) * sizeof(int), 64));
       edge_pointers = reinterpret_cast<int *>(
-          _mm_malloc((num_partitions+1) * sizeof(int), 64));
+          aligned_alloc((num_partitions+1) * sizeof(int), 64));
       col_starts = reinterpret_cast<int *>(
-          _mm_malloc((num_partitions+1) * sizeof(int), 64));
+          aligned_alloc((num_partitions+1) * sizeof(int), 64));
       col_ptrs = reinterpret_cast<int *>(
-          _mm_malloc(num_cols * sizeof(int), 64));
+          aligned_alloc(num_cols * sizeof(int), 64));
       col_indices = reinterpret_cast<int *>(
-          _mm_malloc(num_cols * sizeof(int), 64));
+          aligned_alloc(num_cols * sizeof(int), 64));
 
       for(int i = 0 ; i < nnz ; i++)
       {
@@ -185,7 +185,7 @@ class DCSCTile {
   static void static_partition(int *&row_pointers, int m, int num_partitions,
                                int round) {
     row_pointers = reinterpret_cast<int *>(
-        _mm_malloc((num_partitions + 1) * sizeof(int), 64));
+        aligned_alloc((num_partitions + 1) * sizeof(int), 64));
 
     if (round == 1) {
       int rows_per_partition = m / num_partitions;
@@ -224,7 +224,7 @@ class DCSCTile {
                                 int num_partitions) {
     // Figure out edge pointers
     (*edge_pointers) = reinterpret_cast<int *>(
-        _mm_malloc((num_partitions + 1) * sizeof(int), 64));
+        aligned_alloc((num_partitions + 1) * sizeof(int), 64));
     int p = 0;
     for (int edge_id = 0; edge_id < nnz; edge_id++) {
       while (edges[edge_id].src >= row_pointers[p]) {
@@ -250,7 +250,7 @@ class DCSCTile {
 
       // Set partition IDs for each edge
       tedge_t<T> *p_edges = reinterpret_cast<tedge_t<T> *>(
-          _mm_malloc((uint64_t)nnz * (uint64_t)sizeof(tedge_t<T>), 64));
+          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(tedge_t<T>), 64));
 
       std::cout << "num partitions: " << num_partitions << std::endl;
       double _ep_start = MPI_Wtime();
@@ -310,9 +310,9 @@ class DCSCTile {
 
       // Count columns
       int *ncols =
-          reinterpret_cast<int *>(_mm_malloc(num_partitions * sizeof(int), 64));
+          reinterpret_cast<int *>(aligned_alloc(num_partitions * sizeof(int), 64));
       col_starts = reinterpret_cast<int *>(
-          _mm_malloc((num_partitions + 1) * sizeof(int), 64));
+          aligned_alloc((num_partitions + 1) * sizeof(int), 64));
 #pragma omp parallel for
       for (int p = 0; p < num_partitions; p++) {
         int current_column = -1;
@@ -338,13 +338,13 @@ class DCSCTile {
       // Build DCSC
       std::cout << "Allocating nnz vals: " << nnz << std::endl;
       vals = reinterpret_cast<T *>(
-          _mm_malloc((uint64_t)nnz * (uint64_t)sizeof(T), 64));
+          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(T), 64));
       row_inds = reinterpret_cast<int *>(
-          _mm_malloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
+          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
       col_indices = reinterpret_cast<int *>(
-          _mm_malloc(col_starts[num_partitions] * sizeof(int), 64));
+          aligned_alloc(col_starts[num_partitions] * sizeof(int), 64));
       col_ptrs = reinterpret_cast<int *>(
-          _mm_malloc(col_starts[num_partitions] * sizeof(int), 64));
+          aligned_alloc(col_starts[num_partitions] * sizeof(int), 64));
 
 #pragma omp parallel for
       for (int p = 0; p < num_partitions; p++) {
@@ -369,8 +369,8 @@ class DCSCTile {
         col_ptr[num_columns] = edge_pointers[p + 1] - edge_pointers[p];
         col_index[num_columns] = n + 1;
       }
-      _mm_free(p_edges);
-      _mm_free(ncols);
+      free(p_edges);
+      free(ncols);
     }
     else
     {
@@ -404,13 +404,13 @@ class DCSCTile {
   {
     if(nnz > 0)
     {
-      _mm_free(row_inds);
-      _mm_free(col_ptrs);
-      _mm_free(col_indices);
-      _mm_free(vals);
-      _mm_free(row_pointers);
-      _mm_free(edge_pointers);
-      _mm_free(col_starts);
+      free(row_inds);
+      free(col_ptrs);
+      free(col_indices);
+      free(vals);
+      free(row_pointers);
+      free(edge_pointers);
+      free(col_starts);
     }
     nnz = 0;
   }
