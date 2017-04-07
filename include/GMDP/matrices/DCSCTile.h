@@ -132,19 +132,19 @@ class DCSCTile {
     if(nnz > 0)
     {
       vals = reinterpret_cast<T *>(
-          aligned_alloc(nnz * sizeof(T), 64));
+          aligned_alloc(64, nnz * sizeof(T)));
       row_inds = reinterpret_cast<int *>(
-          aligned_alloc(nnz * sizeof(int), 64));
+          aligned_alloc(64, nnz * sizeof(int)));
       row_pointers = reinterpret_cast<int *>(
-          aligned_alloc((num_partitions+1) * sizeof(int), 64));
+          aligned_alloc(64, (num_partitions+1) * sizeof(int)));
       edge_pointers = reinterpret_cast<int *>(
-          aligned_alloc((num_partitions+1) * sizeof(int), 64));
+          aligned_alloc(64, (num_partitions+1) * sizeof(int)));
       col_starts = reinterpret_cast<int *>(
-          aligned_alloc((num_partitions+1) * sizeof(int), 64));
+          aligned_alloc(64, (num_partitions+1) * sizeof(int)));
       col_ptrs = reinterpret_cast<int *>(
-          aligned_alloc(num_cols * sizeof(int), 64));
+          aligned_alloc(64, num_cols * sizeof(int)));
       col_indices = reinterpret_cast<int *>(
-          aligned_alloc(num_cols * sizeof(int), 64));
+          aligned_alloc(64, num_cols * sizeof(int)));
 
       for(int i = 0 ; i < nnz ; i++)
       {
@@ -185,7 +185,7 @@ class DCSCTile {
   static void static_partition(int *&row_pointers, int m, int num_partitions,
                                int round) {
     row_pointers = reinterpret_cast<int *>(
-        aligned_alloc((num_partitions + 1) * sizeof(int), 64));
+        aligned_alloc(64, (num_partitions + 1) * sizeof(int)));
 
     if (round == 1) {
       int rows_per_partition = m / num_partitions;
@@ -224,7 +224,7 @@ class DCSCTile {
                                 int num_partitions) {
     // Figure out edge pointers
     (*edge_pointers) = reinterpret_cast<int *>(
-        aligned_alloc((num_partitions + 1) * sizeof(int), 64));
+        aligned_alloc(64, (num_partitions + 1) * sizeof(int)));
     int p = 0;
     for (int edge_id = 0; edge_id < nnz; edge_id++) {
       while (edges[edge_id].src >= row_pointers[p]) {
@@ -250,7 +250,7 @@ class DCSCTile {
 
       // Set partition IDs for each edge
       tedge_t<T> *p_edges = reinterpret_cast<tedge_t<T> *>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(tedge_t<T>), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(tedge_t<T>)));
 
       std::cout << "num partitions: " << num_partitions << std::endl;
       double _ep_start = MPI_Wtime();
@@ -310,9 +310,9 @@ class DCSCTile {
 
       // Count columns
       int *ncols =
-          reinterpret_cast<int *>(aligned_alloc(num_partitions * sizeof(int), 64));
+          reinterpret_cast<int *>(aligned_alloc(64, num_partitions * sizeof(int)));
       col_starts = reinterpret_cast<int *>(
-          aligned_alloc((num_partitions + 1) * sizeof(int), 64));
+          aligned_alloc(64, (num_partitions + 1) * sizeof(int)));
 #pragma omp parallel for
       for (int p = 0; p < num_partitions; p++) {
         int current_column = -1;
@@ -338,13 +338,13 @@ class DCSCTile {
       // Build DCSC
       std::cout << "Allocating nnz vals: " << nnz << std::endl;
       vals = reinterpret_cast<T *>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(T), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(T)));
       row_inds = reinterpret_cast<int *>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(int)));
       col_indices = reinterpret_cast<int *>(
-          aligned_alloc(col_starts[num_partitions] * sizeof(int), 64));
+          aligned_alloc(64, col_starts[num_partitions] * sizeof(int)));
       col_ptrs = reinterpret_cast<int *>(
-          aligned_alloc(col_starts[num_partitions] * sizeof(int), 64));
+          aligned_alloc(64, col_starts[num_partitions] * sizeof(int)));
 
 #pragma omp parallel for
       for (int p = 0; p < num_partitions; p++) {

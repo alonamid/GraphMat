@@ -62,7 +62,7 @@ struct edgelist_t {
     n = _n;
     nnz = _nnz;
     if(nnz > 0) {
-      edges = reinterpret_cast<edge_t<T>*>(aligned_alloc((size_t)nnz * sizeof(edge_t<T>), 64));
+      edges = reinterpret_cast<edge_t<T>*>(aligned_alloc(64, (size_t)nnz * sizeof(edge_t<T>)));
     }
   }
   edgelist_t(edge_t<T>* edges, int m, int n, int nnz) : edges(edges), m(m), n(n), nnz(nnz) {}
@@ -285,7 +285,7 @@ void load_edgelist(const char* dir, edgelist_t<T>* edgelist,
   std::cout << "Got: " << edgelist->nnz << " edges" << std::endl;
   
   edgelist->edges = reinterpret_cast<edge_t<T>*>(
-      aligned_alloc((uint64_t)edgelist->nnz * (uint64_t)sizeof(edge_t<T>), 64));
+      aligned_alloc(64, (uint64_t)edgelist->nnz * (uint64_t)sizeof(edge_t<T>)));
 
 
   unsigned long int nnzcnt = 0;
@@ -383,7 +383,7 @@ void remove_empty_columns(edgelist_t<T> * edges, int ** remaining_indices)
     colexists[edges->edges[i].dst-1] = true;
   }
   std::cout << "New ncols: " << new_ncols << std::endl;
-  *(remaining_indices) = (int*) aligned_alloc(new_ncols * sizeof(int), 64);
+  *(remaining_indices) = (int*) aligned_alloc(64, new_ncols * sizeof(int));
   int new_colcnt = 0;
   for(int i = 0 ; i < edges->n; i++)
   {

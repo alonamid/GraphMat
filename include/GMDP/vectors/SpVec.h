@@ -132,7 +132,7 @@ class SpVec {
     if(blob->nnz > 0)
     {
       blob->edges = reinterpret_cast<edge_t<T>*>(
-        aligned_alloc((uint64_t)blob->nnz * (uint64_t)sizeof(edge_t<T>), 64));
+        aligned_alloc(64, (uint64_t)blob->nnz * (uint64_t)sizeof(edge_t<T>)));
       unsigned int nnzs = 0;
       for(int segment = 0 ; segment < nsegments ; segment++)
       {
@@ -217,7 +217,7 @@ class SpVec {
       local_hist[i + 1] = local_hist[i] + recv_count[i];
     }
     edge_t<T>* final_edge_list = reinterpret_cast<edge_t<T>*>(
-        aligned_alloc((uint64_t)new_nnz * (uint64_t)sizeof(edge_t<T>), 64));
+        aligned_alloc(64, (uint64_t)new_nnz * (uint64_t)sizeof(edge_t<T>)));
     for (int i = 0; i < global_nrank; i++) {
       MPI_Irecv(&final_edge_list[local_hist[i]],
                 (uint64_t)sizeof(edge_t<T>) * (uint64_t)recv_count[i], MPI_CHAR,
@@ -249,13 +249,13 @@ class SpVec {
 
     // Sort these edges by segment ID
     edge_t<T>* edges = reinterpret_cast<edge_t<T>*>(
-        aligned_alloc((uint64_t)new_nnz * (uint64_t)sizeof(edge_t<T>), 64));
+        aligned_alloc(64, (uint64_t)new_nnz * (uint64_t)sizeof(edge_t<T>)));
     int* partitions = reinterpret_cast<int*>(
-        aligned_alloc((uint64_t)new_nnz * (uint64_t)sizeof(int), 64));
+        aligned_alloc(64, (uint64_t)new_nnz * (uint64_t)sizeof(int)));
     uint64_t* counts = reinterpret_cast<uint64_t*>(
-        aligned_alloc((nsegments) * sizeof(uint64_t), 64));
+        aligned_alloc(64, (nsegments) * sizeof(uint64_t)));
     uint64_t* start_nzs = reinterpret_cast<uint64_t*>(
-        aligned_alloc((nsegments + 1) * sizeof(uint64_t), 64));
+        aligned_alloc(64, (nsegments + 1) * sizeof(uint64_t)));
     memset(counts, 0, (nsegments) * sizeof(uint64_t));
     memset(start_nzs, 0, (nsegments+1) * sizeof(uint64_t));
     for (uint64_t i = 0; i < (uint64_t)new_nnz; i++) {

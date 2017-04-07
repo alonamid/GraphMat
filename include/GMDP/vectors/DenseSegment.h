@@ -184,7 +184,7 @@ class buffer
       num_ints = _num_ints;
       value = new T[capacity]; 
       bit_vector = new int[num_ints];
-      //compressed_data = reinterpret_cast<T*>(aligned_alloc(capacity * sizeof(T) + capacity*sizeof(int), 64));
+      //compressed_data = reinterpret_cast<T*>(aligned_alloc(64, capacity * sizeof(T) + capacity*sizeof(int)));
       compressed_data = new T[capacity];
       compressed_indices = new int[capacity];
       uninitialized = true;

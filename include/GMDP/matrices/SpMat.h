@@ -360,7 +360,7 @@ class SpMat {
     if(nnzs > 0)
     {
       edgelist->edges = reinterpret_cast<edge_t<T>*>(
-          aligned_alloc((uint64_t)nnzs * (uint64_t)sizeof(edge_t<T>), 64));
+          aligned_alloc(64, (uint64_t)nnzs * (uint64_t)sizeof(edge_t<T>)));
 
       nnzs = 0;
       for (int i = 0; i < ntiles_y; i++) {

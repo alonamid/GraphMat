@@ -106,11 +106,11 @@ class COOTile {
     if(!isEmpty())
     {
       a = reinterpret_cast<T*>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(T), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(T)));
       ja = reinterpret_cast<int*>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
-      ia = reinterpret_cast<int*>(aligned_alloc(nnz * sizeof(int), 64));
-      partition_start  = reinterpret_cast<int*>(aligned_alloc((num_partitions+1) * sizeof(int), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(int)));
+      ia = reinterpret_cast<int*>(aligned_alloc(64, nnz * sizeof(int)));
+      partition_start  = reinterpret_cast<int*>(aligned_alloc(64, (num_partitions+1) * sizeof(int)));
       for(int i = 0 ; i < nnz ; i++)
       {
         ar & a[i];
@@ -143,11 +143,11 @@ class COOTile {
     if (nnz > 0) {
       __gnu_parallel::sort(edges, edges + nnz, compare_notrans_coo<T>);
       a = reinterpret_cast<T*>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(T), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(T)));
       ja = reinterpret_cast<int*>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(int)));
       ia = reinterpret_cast<int*>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(int)));
 
       // convert to COO
       #pragma omp parallel for

@@ -110,8 +110,8 @@ class HybridTile {
     nnz1 = ia_gte16[m];
     nnz2 = ia_lt16[m];
 
-    edge_t<T> * edges_gte16 = (edge_t<T>*)aligned_alloc(nnz1 * sizeof(edge_t<T>), 64);
-    edge_t<T> * edges_lt16 = (edge_t<T>*)aligned_alloc(nnz2 * sizeof(edge_t<T>), 64);
+    edge_t<T> * edges_gte16 = (edge_t<T>*)aligned_alloc(64, nnz1 * sizeof(edge_t<T>));
+    edge_t<T> * edges_lt16 = (edge_t<T>*)aligned_alloc(64, nnz2 * sizeof(edge_t<T>));
 
     for(unsigned int i = 0 ; i < m ; i++)
     {

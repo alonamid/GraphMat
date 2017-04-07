@@ -121,12 +121,12 @@ class COOSIMD32Tile {
     if(!isEmpty())
     {
       a = reinterpret_cast<T*>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(T), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(T)));
       ja = reinterpret_cast<int*>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
-      ia = reinterpret_cast<int*>(aligned_alloc(nnz * sizeof(int), 64));
-      partition_start  = reinterpret_cast<int*>(aligned_alloc((num_partitions+1) * sizeof(int), 64));
-      simd_nnz = reinterpret_cast<int*>(aligned_alloc((num_partitions+1) * sizeof(int), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(int)));
+      ia = reinterpret_cast<int*>(aligned_alloc(64, nnz * sizeof(int)));
+      partition_start  = reinterpret_cast<int*>(aligned_alloc(64, (num_partitions+1) * sizeof(int)));
+      simd_nnz = reinterpret_cast<int*>(aligned_alloc(64, (num_partitions+1) * sizeof(int)));
       for(int i = 0 ; i < nnz ; i++)
       {
         ar & a[i];
@@ -162,12 +162,12 @@ class COOSIMD32Tile {
       double stt = MPI_Wtime();
     if (nnz > 0) {
       a = reinterpret_cast<T*>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(T), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(T)));
       ja = reinterpret_cast<int*>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(int)));
       ia = reinterpret_cast<int*>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
-      tedge_t<T> * tmpedges = reinterpret_cast<tedge_t<T> *>( aligned_alloc(((uint64_t)nnz) * (uint64_t)sizeof(tedge_t<T>), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(int)));
+      tedge_t<T> * tmpedges = reinterpret_cast<tedge_t<T> *>( aligned_alloc(64, ((uint64_t)nnz) * (uint64_t)sizeof(tedge_t<T>)));
       num_partitions = omp_get_max_threads() * 4;
 
       // Set partition IDs

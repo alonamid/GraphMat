@@ -98,10 +98,10 @@ class CSRTile {
     if(!isEmpty())
     {
       a = reinterpret_cast<T*>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(T), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(T)));
       ja = reinterpret_cast<int*>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
-      ia = reinterpret_cast<int*>(aligned_alloc((m + 1) * sizeof(int), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(int)));
+      ia = reinterpret_cast<int*>(aligned_alloc(64, (m + 1) * sizeof(int)));
       for(int i = 0 ; i < nnz ; i++)
       {
         ar & a[i];
@@ -130,12 +130,12 @@ class CSRTile {
     if (nnz > 0) {
       __gnu_parallel::sort(edges, edges + nnz, compare_notrans<T>);
       a = reinterpret_cast<T*>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(T), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(T)));
       ja = reinterpret_cast<int*>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(int)));
       int * jia  = reinterpret_cast<int*>(
-          aligned_alloc((uint64_t)nnz * (uint64_t)sizeof(int), 64));
-      ia = reinterpret_cast<int*>(aligned_alloc((m + 1) * sizeof(int), 64));
+          aligned_alloc(64, (uint64_t)nnz * (uint64_t)sizeof(int)));
+      ia = reinterpret_cast<int*>(aligned_alloc(64, (m + 1) * sizeof(int)));
 
       // convert to CSR
       #pragma omp parallel for
