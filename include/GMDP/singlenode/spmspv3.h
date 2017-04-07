@@ -56,7 +56,7 @@ void my_spmspv3(int* row_inds, int* col_ptrs, int* col_indices, Ta* vals,
 	  TRACE_VERTEX_READ(col_index, &(col_indices[col_starts[p] + j]), sizeof(trace_vertex_t));
       if(get_bitvector(col_index, xbit_vector)) {
         Tx Xval = xvalue[col_index];
-		TRACE_PROP_READ(col_index, &(xvalue[col_index]), sizeof(trace_prop_t));
+		TRACE_PROP_READ(col_index, &(xvalue[col_index]));
         _mm_prefetch((char*)(xvalue + column_offset[j + 4]), _MM_HINT_T0);
 
         int nz_idx = col_ptrs_cur[j];
@@ -72,19 +72,19 @@ void my_spmspv3(int* row_inds, int* col_ptrs, int* col_indices, Ta* vals,
             Ty tmp_mul;
             //Ty tmp_add;
             op_mul(Aval, Xval, vpvalue[row_ind], &tmp_mul, vsp);
-			TRACE_PROP_WRITE(col_index, &tmp_mul, sizeof(trace_prop_t));
+			TRACE_PROP_WRITE(col_index, &tmp_mul);
             op_add(yvalue[row_ind], tmp_mul, &yvalue[row_ind], vsp);
             //yvalue[row_ind] = tmp_add;
-			TRACE_PROP_READ(row_ind, &(yvalue[row_ind]), sizeof(trace_prop_t));
-			TRACE_PROP_READ(col_index, &(tmp_mul), sizeof(trace_prop_t));
-			TRACE_PROP_WRITE(row_ind, &(yvalue[row_ind]), sizeof(trace_prop_t));
+			TRACE_PROP_READ(row_ind, &(yvalue[row_ind]));
+			TRACE_PROP_READ(col_index, &(tmp_mul));
+			TRACE_PROP_WRITE(row_ind, &(yvalue[row_ind]));
 	  }
 	  else
 	  {
             //Ty tmp_mul;
             //op_mul(Aval, Xval, VPVal, &tmp_mul, vsp);
             op_mul(Aval, Xval, vpvalue[row_ind], &yvalue[row_ind], vsp);
-			TRACE_PROP_WRITE(col_index, &yvalue[row_ind], sizeof(trace_prop_t));
+			TRACE_PROP_WRITE(col_index, &yvalue[row_ind]);
             //yvalue[row_ind] = tmp_mul;
             set_bitvector(row_ind, ybit_vector);
 	  }
