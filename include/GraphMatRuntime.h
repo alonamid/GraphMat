@@ -202,7 +202,7 @@ void run_graph_program(GraphProgram<T,U,V,E>* gp, Graph<V,E>& g, int iterations=
         for (int i = 0; i < y.segments[segmentId]->num_ints; i++) {
           unsigned int value = segment->bit_vector[i];
           while (value != 0) {
-            int last_bit = __builtin_ffs(value);
+            int last_bit = __builtin_ffs(value) - 1;
             int idx = i*32 + last_bit; 
 
             V old_prop;
