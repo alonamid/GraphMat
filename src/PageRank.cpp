@@ -30,6 +30,9 @@
  * ******************************************************************************/
 #include "GraphMatRuntime.h"
 
+#ifdef ON_ARM
+#include "../gem5-util/m5op.h"
+#endif
 
 class PR {
   public:
@@ -120,7 +123,11 @@ void run_pagerank(const char* filename) {
   Degree<PR, edge> dg;
 
  
-  G.ReadMTX(filename); 
+  G.ReadMTX(filename);
+
+#ifdef ON_ARM
+  m5_checkpoint(0,0);
+#endif 
 
   auto dg_tmp = GraphMat::graph_program_init(dg, G);
 
@@ -146,6 +153,10 @@ void run_pagerank(const char* filename) {
   gettimeofday(&end, 0);
   time = (end.tv_sec-start.tv_sec)*1e3+(end.tv_usec-start.tv_usec)*1e-3;
   printf("PR Time = %.3f ms \n", time);
+
+#ifdef ON_ARM 
+  m5_dumpreset_stats(0,0);
+#endif
 
   GraphMat::graph_program_clear(pr_tmp);
 

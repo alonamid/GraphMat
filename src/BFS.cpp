@@ -33,6 +33,10 @@
 #include <climits>
 #include <ostream>
 
+#ifdef ON_ARM
+#include "../gem5-util/m5op.h"
+#endif
+
 typedef unsigned int depth_type;
 
 depth_type MAX_DIST = std::numeric_limits<depth_type>::max();
@@ -109,8 +113,11 @@ void reachable_or_not(BFSD2* v, int *result, void* params=nullptr) {
 
 void run_bfs(char* filename, int v) {
   GraphMat::Graph<BFSD2> G;
-  G.ReadMTX(filename); 
-  
+  G.ReadMTX(filename);
+
+#ifdef ON_ARM 
+  m5_checkpoint(0,0);
+#endif 
   for(int i = 0 ; i < G.getNumberOfVertices() ; i++)
   {
     BFSD2 vp = G.getVertexproperty(i+1);
@@ -136,6 +143,10 @@ void run_bfs(char* filename, int v) {
 
   gettimeofday(&end, 0);
   printf("Time = %.3f ms \n", (end.tv_sec-start.tv_sec)*1e3+(end.tv_usec-start.tv_usec)*1e-3);
+
+#ifdef ON_ARM
+  m5_dumpreset_stats(0,0);
+#endif
  
   GraphMat::graph_program_clear(b_tmp);
 
@@ -152,7 +163,6 @@ void run_bfs(char* filename, int v) {
       printf("Depth %d : INF \n", i);
     }
   }
-
 }
 
 int main(int argc, char* argv[]) {
