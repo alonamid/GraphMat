@@ -18,7 +18,10 @@ else
   CXX_OPTIONS=-fopenmp --std=c++11 -I/usr/include/mpi/
 endif
 
-CXX_OPTIONS+=-I$(INCLUDEDIR) -I$(DIST_PRIMITIVES_PATH)
+CXX_OPTIONS+=-I$(INCLUDEDIR) -I$(DIST_PRIMITIVES_PATH) -I./gem5-util
+
+CXX_OPTIONS+=-DON_ARM
+ASM=./gem5-util/m5op_arm_A64.S
 
 ifeq (${debug}, 1)
   CXX_OPTIONS += -O0 -g -D__DEBUG 
@@ -50,10 +53,10 @@ DEPS = $(include_headers) $(dist_primitives_headers)
 
 APPS=$(BINDIR)/graph_converter $(BINDIR)/PageRank $(BINDIR)/IncrementalPageRank $(BINDIR)/BFS $(BINDIR)/SSSP $(BINDIR)/LDA $(BINDIR)/SGD $(BINDIR)/TriangleCounting #$(BINDIR)/DS
 
-all: $(APPS)
+all: $(APPS)  
 	
-$(BINDIR)/% : $(SRCDIR)/%.cpp $(DEPS)  
-	$(MPICXX) $(CXX_OPTIONS) -o $@ $< $(LD_OPTIONS)
+$(BINDIR)/% : $(SRCDIR)/%.cpp $(DEPS) $(ASM) 
+	$(MPICXX) $(CXX_OPTIONS) -o $@ $< $(ASM) $(LD_OPTIONS)
 
 # --- Test --- #
 test: $(TESTBINDIR)/test 
@@ -61,11 +64,11 @@ test_headers = $(wildcard $(TESTDIR)/*.h)
 test_src = $(wildcard $(TESTDIR)/*.cpp)
 test_objects = $(patsubst $(TESTDIR)/%.cpp, $(TESTBINDIR)/%.o, $(test_src))
 
-$(TESTBINDIR)/%.o : $(TESTDIR)/%.cpp $(DEPS) $(test_headers) 
-	$(MPICXX) $(CXX_OPTIONS) -I$(CATCHDIR)/include -c $< -o $@ $(LD_OPTIONS)
+$(TESTBINDIR)/%.o : $(TESTDIR)/%.cpp $(DEPS) $(test_headers) $(ASM) 
+	$(MPICXX) $(CXX_OPTIONS) -I$(CATCHDIR)/include -c $< -o $@ $(ASM) $(LD_OPTIONS)
 
-$(TESTBINDIR)/test: $(test_objects) 
-	$(MPICXX) $(CXX_OPTIONS) -I$(CATCHDIR)/include -o $(TESTBINDIR)/test $(test_objects) $(LD_OPTIONS)
+$(TESTBINDIR)/test: $(test_objects) $(ASM)
+	$(MPICXX) $(CXX_OPTIONS) -I$(CATCHDIR)/include -o $(TESTBINDIR)/test $(test_objects) $(ASM) $(LD_OPTIONS)
 
 # --- clean --- #
 
