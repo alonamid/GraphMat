@@ -60,6 +60,7 @@ inline bool get_bitvector(unsigned int idx, const int* bitvec) {
     int dword = (neighbor_id >> 5);
     int bit = neighbor_id  & 0x1F;
     unsigned int current_value = bitvec[dword];
+    //printf("bitvector value for index %d is %#010x, address is %p, base address is %p\n",idx,current_value,&bitvec[dword], bitvec);
     return ( (current_value & (1<<bit)) );
 }
 

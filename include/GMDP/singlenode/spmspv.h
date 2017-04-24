@@ -35,6 +35,10 @@
 //#include <xmmintrin.h>
 #include "GMDP/utils/bitvector.h"
 
+#ifdef ON_ARM
+#include "../gem5-util/m5op.h"
+#endif
+
 
 template <typename Ta, typename Tx, typename Ty>
 void my_spmspv(int* row_inds, int* col_ptrs, int* col_indices, Ta* vals,
@@ -47,17 +51,31 @@ void my_spmspv(int* row_inds, int* col_ptrs, int* col_indices, Ta* vals,
 // memset(new_nnz, 0, num_partitions * sizeof(int));
 #pragma omp parallel for schedule(dynamic, 1)
   for (int p = 0; p < num_partitions; p++) {
+
     // For each column
     const int* column_offset = col_indices + col_starts[p];
     const int* partitioned_row_offset = row_inds + edge_pointers[p];
     const Ta* partitioned_val_offset = vals + edge_pointers[p];
     const int* col_ptrs_cur = col_ptrs + col_starts[p];
+
+     ////graph prefetcher settings
+    //printf("I am in spmspv, and going to set prefetcher address bounds\n");
+    set_addr_bounds(4,(uint64_t)(xbit_vector), (uint64_t)(xbit_vector+(n/32+1)),4);
+    //printf("address bounds of xbit_vector are base: %p end: %p\n", xbit_vector, xbit_vector+(n/32+1));
+    set_addr_bounds(0,(uint64_t)(col_indices + col_starts[p]), (uint64_t)(col_indices+col_starts[p+1]),4);
+    set_addr_bounds(6,(uint64_t)(xvalue), (uint64_t)(xvalue+n),4);
+    set_addr_bounds(1,(uint64_t)(col_ptrs_cur), (uint64_t)(col_ptrs+col_starts[p+1]),4);
+    set_addr_bounds(2,(uint64_t)row_inds,(uint64_t)(row_inds + edge_pointers[p+1]),4);
+    set_addr_bounds(7,(uint64_t)partitioned_val_offset,(uint64_t)(vals+edge_pointers[p+1]),4);
+    set_addr_bounds(3,(uint64_t)yvalue,(uint64_t)(yvalue+edge_pointers[p+1]),4);
+
     for (int j = 0; j < (col_starts[p + 1] - col_starts[p]) - 1 ; j++) {
       int col_index = col_indices[col_starts[p] + j];
       if(get_bitvector(col_index, xbit_vector)) {
         Tx Xval = xvalue[col_index];
         //_mm_prefetch((char*)(xvalue + column_offset[j + 4]), _MM_HINT_T0);
-
+        //printf("x_bivector for col_index %d is %#010x\n",col_index, xbit_vector[col_index/32]);
+        //printf("x_bitvector value for col_index %d is %#010x, address is %p, base address is %p\n",col_index,xbit_vector[col_index/32],&xbit_vector[col_index/32], xbit_vector);
         int nz_idx = col_ptrs_cur[j];
         for (; nz_idx < col_ptrs_cur[j + 1]; nz_idx++) {
           int row_ind = partitioned_row_offset[nz_idx];
@@ -66,7 +84,8 @@ void my_spmspv(int* row_inds, int* col_ptrs, int* col_indices, Ta* vals,
           op_mul(Aval, Xval, &temp_mul_result, vsp);
           if(get_bitvector(row_ind, ybit_vector))
 	  {
-	    //Ty temp_y_copy = yvalue[row_ind];
+	    
+            //Ty temp_y_copy = yvalue[row_ind];
             //op_add(temp_y_copy, temp_mul_result, &(yvalue[row_ind]), vsp);
             op_add(yvalue[row_ind], temp_mul_result, &(yvalue[row_ind]), vsp);
 	  }

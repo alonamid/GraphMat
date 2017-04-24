@@ -28,11 +28,11 @@
 * ******************************************************************************/
 /* Narayanan Sundaram (Intel Corp.)
  * ******************************************************************************/
-#include "GraphMatRuntime.h"
-
 #ifdef ON_ARM
 #include "../gem5-util/m5op.h"
 #endif
+
+#include "GraphMatRuntime.h"
 
 class PR {
   public:

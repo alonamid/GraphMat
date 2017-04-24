@@ -35,6 +35,11 @@
 //#include <xmmintrin.h>
 #include "GMDP/utils/bitvector.h"
 
+#ifdef ON_ARM
+#include "../gem5-util/m5op.h"
+#endif
+
+
 template <typename Ta, typename Tx, typename Tvp, typename Ty>
 void my_spmspv3(int* row_inds, int* col_ptrs, int* col_indices, Ta* vals,
                int num_partitions, int* row_pointers, int* col_starts,
@@ -51,13 +56,25 @@ void my_spmspv3(int* row_inds, int* col_ptrs, int* col_indices, Ta* vals,
     const int* partitioned_row_offset = row_inds + edge_pointers[p];
     const Ta* partitioned_val_offset = vals + edge_pointers[p];
     const int* col_ptrs_cur = col_ptrs + col_starts[p];
+   
+    ////graph prefetcher settings
+    printf("I am in spmspv3, and going to set prefetcher address bounds\n");
+    set_addr_bounds(4,(uint64_t)(xbit_vector), (uint64_t)(xbit_vector+n/32),4);
+    set_addr_bounds(0,(uint64_t)(col_indices[col_starts[p]]), (uint64_t)(col_indices[col_starts[p+1]]),4);
+    set_addr_bounds(6,(uint64_t)(xvalue), (uint64_t)(xvalue+n),4);
+    set_addr_bounds(1,(uint64_t)(col_ptrs_cur), (uint64_t)(col_ptrs+col_starts[p+1]),4);
+    set_addr_bounds(2,(uint64_t)row_inds,(uint64_t)(row_inds + edge_pointers[p+1]),4);
+    set_addr_bounds(7,(uint64_t)partitioned_val_offset,(uint64_t)(vals+edge_pointers[p+1]),4);
+    set_addr_bounds(3,(uint64_t)yvalue,(uint64_t)(yvalue+edge_pointers[p+1]),4);    
+
+
     for (int j = 0; j < (col_starts[p + 1] - col_starts[p]) - 1; j++) {
       int col_index = col_indices[col_starts[p] + j];
       if(get_bitvector(col_index, xbit_vector)) {
         Tx Xval = xvalue[col_index];
         //_mm_prefetch((char*)(xvalue + column_offset[j + 4]), _MM_HINT_T0);
 
-        int nz_idx = col_ptrs_cur[j];
+        int nz_idx = col_ptrs_cur[j]; //=col_ptrs[col_starts[p]+j];
         for (; nz_idx < col_ptrs_cur[j + 1]; nz_idx++) {
           int row_ind = partitioned_row_offset[nz_idx];
 	  //Tvp VPVal = vpvalue[row_ind];

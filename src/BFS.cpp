@@ -29,13 +29,13 @@
 /* Narayanan Sundaram (Intel Corp.)
  * ******************************************************************************/
 
-#include "GraphMatRuntime.h"
-#include <climits>
-#include <ostream>
-
 #ifdef ON_ARM
 #include "../gem5-util/m5op.h"
 #endif
+
+#include "GraphMatRuntime.h"
+#include <climits>
+#include <ostream>
 
 typedef unsigned int depth_type;
 

@@ -51,7 +51,8 @@ include_headers = $(wildcard $(INCLUDEDIR)/*.h)
 dist_primitives_headers = $(wildcard $(DIST_PRIMITIVES_PATH)/*.h $(DIST_PRIMITIVES_PATH)/*/*.h)
 DEPS = $(include_headers) $(dist_primitives_headers)
 
-APPS=$(BINDIR)/graph_converter $(BINDIR)/PageRank $(BINDIR)/IncrementalPageRank $(BINDIR)/BFS $(BINDIR)/SSSP $(BINDIR)/LDA $(BINDIR)/SGD $(BINDIR)/TriangleCounting #$(BINDIR)/DS
+#APPS=$(BINDIR)/graph_converter $(BINDIR)/PageRank $(BINDIR)/IncrementalPageRank $(BINDIR)/BFS $(BINDIR)/SSSP $(BINDIR)/LDA $(BINDIR)/SGD $(BINDIR)/TriangleCounting #$(BINDIR)/DS
+APPS=$(BINDIR)/graph_converter $(BINDIR)/PageRank $(BINDIR)/BFS
 
 all: $(APPS)  
 	
