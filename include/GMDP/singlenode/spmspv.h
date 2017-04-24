@@ -63,11 +63,11 @@ void my_spmspv(int* row_inds, int* col_ptrs, int* col_indices, Ta* vals,
     set_addr_bounds(4,(uint64_t)(xbit_vector), (uint64_t)(xbit_vector+(n/32+1)),4);
     //printf("address bounds of xbit_vector are base: %p end: %p\n", xbit_vector, xbit_vector+(n/32+1));
     set_addr_bounds(0,(uint64_t)(col_indices + col_starts[p]), (uint64_t)(col_indices+col_starts[p+1]),4);
-    set_addr_bounds(6,(uint64_t)(xvalue), (uint64_t)(xvalue+n),4);
+    set_addr_bounds(6,(uint64_t)(xvalue), (uint64_t)(xvalue+n),sizeof(Tx));
     set_addr_bounds(1,(uint64_t)(col_ptrs_cur), (uint64_t)(col_ptrs+col_starts[p+1]),4);
-    set_addr_bounds(2,(uint64_t)row_inds,(uint64_t)(row_inds + edge_pointers[p+1]),4);
-    set_addr_bounds(7,(uint64_t)partitioned_val_offset,(uint64_t)(vals+edge_pointers[p+1]),4);
-    set_addr_bounds(3,(uint64_t)yvalue,(uint64_t)(yvalue+edge_pointers[p+1]),4);
+    set_addr_bounds(2,(uint64_t)partitioned_row_offset,(uint64_t)(row_inds + edge_pointers[p+1]),4);
+    set_addr_bounds(7,(uint64_t)partitioned_val_offset,(uint64_t)(vals+edge_pointers[p+1]),sizeof(Ta));
+    set_addr_bounds(3,(uint64_t)yvalue,(uint64_t)(yvalue+n),sizeof(Ty));
 
     for (int j = 0; j < (col_starts[p + 1] - col_starts[p]) - 1 ; j++) {
       int col_index = col_indices[col_starts[p] + j];
